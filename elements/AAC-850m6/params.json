@@ -89,7 +89,7 @@
             "name": "colorscheme",
             "optional": true,
             "options": "normal,dark,light,revert",
-            "rank": 6
+            "rank": 7
         },
         "AAP": {
             "caption": "center vertically",
@@ -97,7 +97,7 @@
             "doc": "horizontal & vertical align input to the center",
             "editor": "Checkbox",
             "name": "vcenter",
-            "rank": 7
+            "rank": 8
         },
         "AAQ": {
             "caption": "fit width to content",
@@ -105,7 +105,7 @@
             "doc": "set to false (uncheck) if needed to span to 100% width of parent's element",
             "editor": "Checkbox",
             "name": "fitwidth",
-            "rank": 8
+            "rank": 9
         },
         "AAR": {
             "caption": "fit height to content",
@@ -113,7 +113,7 @@
             "doc": "set to false (uncheck) if needed to span to 100% height of parent's element",
             "editor": "Checkbox",
             "name": "fitheight",
-            "rank": 9
+            "rank": 10
         },
         "AAY": {
             "caption": "this input should not be empty",
@@ -122,6 +122,14 @@
             "editor": "Checkbox",
             "name": "required",
             "rank": 5
+        },
+        "AAb": {
+            "caption": "this input cannot be clicked",
+            "default_val": false,
+            "editor": "DynamicValue",
+            "name": "disabled",
+            "rank": 6,
+            "value": "boolean"
         }
     },
     "has_reset_fn": true,

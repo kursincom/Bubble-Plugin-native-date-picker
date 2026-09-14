@@ -5,6 +5,7 @@ function(instance, context) {
         "datetimeinput" + Math.floor(Math.random() * 1000000).toString();
     instance.data.valueOnFocus = "";
     instance.data.initialKey = null;
+    instance.data.resetEventTriggered = true;
 
     const input = document.createElement("input");
     input.id = instance.data.inputid;
@@ -75,6 +76,7 @@ function(instance, context) {
 
     input.addEventListener("focus", function() {
         instance.data.valueOnFocus = this.value;
+        instance.data.resetEventTriggered = !this.value;
         instance.publishState("is_focused", true);
         instance.triggerEvent("focused");
     });
@@ -84,8 +86,20 @@ function(instance, context) {
             this.value !== instance.data.valueOnFocus;
         const isValid = this.checkValidity();
 
+        if (this.validity.badInput) {
+            instance.data.publishInputValue();
+        }
+
         instance.publishState("is_focused", false);
         instance.publishState("valid", isValid);
+
+        if (
+            !this.value &&
+            !instance.data.resetEventTriggered
+        ) {
+            instance.triggerEvent("reset");
+            instance.data.resetEventTriggered = true;
+        }
 
         if (valueChanged) {
             instance.triggerEvent("value_changed");
@@ -99,14 +113,23 @@ function(instance, context) {
     });
 
     input.addEventListener("input", function() {
-        instance.data.publishInputValue();
         instance.publishState("valid", this.checkValidity());
 
-        if (!this.value) {
-            instance.triggerEvent("reset");
+        if (this.validity.badInput) {
             return;
         }
 
+        instance.data.publishInputValue();
+
+        if (!this.value) {
+            if (!instance.data.resetEventTriggered) {
+                instance.triggerEvent("reset");
+                instance.data.resetEventTriggered = true;
+            }
+            return;
+        }
+
+        instance.data.resetEventTriggered = false;
         instance.triggerEvent("dateready");
     });
 }

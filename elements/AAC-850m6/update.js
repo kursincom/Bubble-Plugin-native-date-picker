@@ -8,6 +8,7 @@ function(instance, properties, context) {
     instance.data.borderstyle = properties.bubble.border_style();
 
     instance.data.required = properties.required === true;
+    instance.data.disabled = properties.disabled === true;
     instance.data.fitwidthtocontent = properties.fitwidth === true;
     instance.data.fitheighttocontent = properties.fitheight === true;
     instance.data.vcenter = properties.vcenter === true;
@@ -41,6 +42,7 @@ function(instance, properties, context) {
 
     input.type = instance.data.format;
     input.required = instance.data.required;
+    input.disabled = instance.data.disabled;
     input.step = instance.data.step;
     input.min = instance.data.min;
     input.max = instance.data.max;
