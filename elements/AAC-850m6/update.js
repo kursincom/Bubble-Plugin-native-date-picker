@@ -1,32 +1,21 @@
 function(instance, properties, context) {
     const fontParts = properties.bubble.font_face().split(":");
 
-    instance.data.fontsize =
-        properties.bubble.font_size() + "px";
+    instance.data.fontsize = properties.bubble.font_size() + "px";
     instance.data.fontface = fontParts[0];
     instance.data.fontweight = fontParts[3];
-    instance.data.borderwidth =
-        properties.bubble.border_width() + "px";
-    instance.data.borderstyle =
-        properties.bubble.border_style();
+    instance.data.borderwidth = properties.bubble.border_width() + "px";
+    instance.data.borderstyle = properties.bubble.border_style();
 
-    instance.data.required =
-        properties.required === true;
-    instance.data.fitwidthtocontent =
-        properties.fitwidth === true;
-    instance.data.fitheighttocontent =
-        properties.fitheight === true;
-    instance.data.vcenter =
-        properties.vcenter === true;
-    instance.data.colorscheme =
-        properties.colorscheme || "normal";
-
+    instance.data.required = properties.required === true;
+    instance.data.fitwidthtocontent = properties.fitwidth === true;
+    instance.data.fitheighttocontent = properties.fitheight === true;
+    instance.data.vcenter = properties.vcenter === true;
+    instance.data.colorscheme = properties.colorscheme || "normal";
     instance.data.step =
-        properties.step === null ||
-        properties.step === undefined
+        properties.step === null || properties.step === undefined
             ? ""
             : String(properties.step);
-
     instance.data.min = properties.min || "";
     instance.data.max = properties.max || "";
 
@@ -43,8 +32,7 @@ function(instance, properties, context) {
         instance.data.format = "datetime-local";
     }
 
-    const input =
-        instance.data.input ||
+    const input = instance.data.input ||
         document.getElementById(instance.data.inputid);
 
     if (!input) {
@@ -56,42 +44,43 @@ function(instance, properties, context) {
     input.step = instance.data.step;
     input.min = instance.data.min;
     input.max = instance.data.max;
-    input.style.colorScheme =
-        instance.data.colorscheme;
+    input.style.colorScheme = instance.data.colorscheme;
 
-    const canvas = instance.canvas[0];
-
-    canvas.style.width =
+    const canvas = instance.canvas;
+    canvas.css(
+        "width",
         instance.data.fitwidthtocontent
             ? "max-content"
-            : "100%";
-
-    canvas.style.height =
+            : "100%"
+    );
+    canvas.css(
+        "height",
         instance.data.fitheighttocontent
             ? "max-content"
-            : "100%";
-
-    canvas.style.display =
-        instance.data.vcenter ? "flex" : "";
-
-    canvas.style.justifyContent =
-        instance.data.vcenter ? "center" : "";
-
-    canvas.style.alignItems =
-        instance.data.vcenter ? "center" : "";
+            : "100%"
+    );
+    canvas.css(
+        "display",
+        instance.data.vcenter ? "flex" : ""
+    );
+    canvas.css(
+        "justifyContent",
+        instance.data.vcenter ? "center" : ""
+    );
+    canvas.css(
+        "alignItems",
+        instance.data.vcenter ? "center" : ""
+    );
 
     const initialDate = properties.initial
         ? new Date(properties.initial)
         : null;
-
     const initialIsValid =
         initialDate !== null &&
         !Number.isNaN(initialDate.getTime());
-
     const initialKey = initialIsValid
         ? instance.data.format + ":" + initialDate.getTime()
         : instance.data.format + ":empty";
-
     const initialChanged =
         instance.data.initialKey !== initialKey;
 
@@ -106,12 +95,10 @@ function(instance, properties, context) {
             const pad = function(value) {
                 return String(value).padStart(2, "0");
             };
-
             const dateValue =
                 initialDate.getFullYear() + "-" +
                 pad(initialDate.getMonth() + 1) + "-" +
                 pad(initialDate.getDate());
-
             const timeValue =
                 pad(initialDate.getHours()) + ":" +
                 pad(initialDate.getMinutes());
@@ -123,8 +110,7 @@ function(instance, properties, context) {
             } else if (instance.data.format === "time") {
                 input.value = timeValue;
             } else {
-                input.value =
-                    dateValue + "T" + timeValue;
+                input.value = dateValue + "T" + timeValue;
             }
         }
 
@@ -138,9 +124,5 @@ function(instance, properties, context) {
     }
 
     instance.data.initialKey = initialKey;
-
-    instance.publishState(
-        "valid",
-        input.checkValidity()
-    );
+    instance.publishState("valid", input.checkValidity());
 }

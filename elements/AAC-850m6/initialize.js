@@ -22,7 +22,7 @@ function(instance, context) {
     input.style.textDecoration = "inherit";
     input.style.textAlign = "inherit";
 
-    instance.canvas[0].appendChild(input);
+    instance.canvas.append(input);
     instance.data.input = input;
 
     instance.data.publishInputValue = function(referenceDate) {
@@ -38,17 +38,9 @@ function(instance, context) {
         let dateValue;
 
         if (instance.data.format === "date") {
-            dateValue = new Date(
-                parts[0],
-                parts[1] - 1,
-                parts[2]
-            );
+            dateValue = new Date(parts[0], parts[1] - 1, parts[2]);
         } else if (instance.data.format === "month") {
-            dateValue = new Date(
-                parts[0],
-                parts[1] - 1,
-                1
-            );
+            dateValue = new Date(parts[0], parts[1] - 1, 1);
         } else if (instance.data.format === "time") {
             dateValue = referenceDate
                 ? new Date(referenceDate.getTime())
@@ -83,7 +75,6 @@ function(instance, context) {
 
     input.addEventListener("focus", function() {
         instance.data.valueOnFocus = this.value;
-
         instance.publishState("is_focused", true);
         instance.triggerEvent("focused");
     });
