@@ -1,107 +1,111 @@
 function(instance, properties, context) {
+    const fontParts = properties.bubble.font_face().split(":");
 
-  	instance.data.fontsize = properties.bubble.font_size() + "px";
-    instance.data.fontface = properties.bubble.font_face().split(':')[0];
-    instance.data.fontweight = properties.bubble.font_face().split(':')[3];
-    instance.data.borderwidth = properties.bubble.border_width() + "px";
-    instance.data.borderstyle = properties.bubble.border_style();
-    instance.data.required = properties.required === true;
+    instance.data.fontsize =
+        properties.bubble.font_size() + "px";
+    instance.data.fontface = fontParts[0];
+    instance.data.fontweight = fontParts[3];
+    instance.data.borderwidth =
+        properties.bubble.border_width() + "px";
+    instance.data.borderstyle =
+        properties.bubble.border_style();
 
-    const currentInput =
+    instance.data.required =
+        properties.required === true;
+    instance.data.fitwidthtocontent =
+        properties.fitwidth === true;
+    instance.data.fitheighttocontent =
+        properties.fitheight === true;
+    instance.data.vcenter =
+        properties.vcenter === true;
+    instance.data.colorscheme =
+        properties.colorscheme || "normal";
+
+    instance.data.step =
+        properties.step === null ||
+        properties.step === undefined
+            ? ""
+            : String(properties.step);
+
+    instance.data.min = properties.min || "";
+    instance.data.max = properties.max || "";
+
+    if (properties.format === "date") {
+        instance.data.format = "date";
+    } else if (properties.format === "time") {
+        instance.data.format = "time";
+    } else if (
+        properties.format === "month" ||
+        properties.format === "month (see info)"
+    ) {
+        instance.data.format = "month";
+    } else {
+        instance.data.format = "datetime-local";
+    }
+
+    const input =
+        instance.data.input ||
         document.getElementById(instance.data.inputid);
 
-    if (currentInput) {
-        currentInput.required = instance.data.required;
-        instance.publishState(
-            "valid",
-            currentInput.checkValidity()
-        );
-    }
-//    instance.data.bgcolor = properties.bubble.bgcolor();
-
-	    if (properties.fitwidth) {
- 	   instance.data.fitwidthtocontent = properties.fitwidth
-	    }
-		else {
-       instance.data.fitwidthtocontent = false
-    	}
-
-        if (properties.fitheight) {
- 	   instance.data.fitheighttocontent = properties.fitheight
-	    }
-		else {
-       	instance.data.fitheighttocontent = false
-    	}
-
-    if (properties.vcenter) {
-        instance.data.vcenter = properties.vcenter
+    if (!input) {
+        return;
     }
 
-    
-    if (properties.colorscheme) {
-    instance.data.colorscheme = properties.colorscheme
-    }
-    
-    if (properties.step) {
-    instance.data.step = properties.step
-    }
+    input.type = instance.data.format;
+    input.required = instance.data.required;
+    input.step = instance.data.step;
+    input.min = instance.data.min;
+    input.max = instance.data.max;
+    input.style.colorScheme =
+        instance.data.colorscheme;
 
-    if (properties.min) {
-    instance.data.min = properties.min
-    }
+    const canvas = instance.canvas[0];
 
-    if (properties.max) {
-    instance.data.max = properties.max
-    }
+    canvas.style.width =
+        instance.data.fitwidthtocontent
+            ? "max-content"
+            : "100%";
 
-    
-    if (properties.format == 'date') {
-        instance.data.format = 'date'
-    }
-    else if (properties.format == 'time') {
-        instance.data.format = 'time'
-    }
-    else if (properties.format == 'month') {
-        instance.data.format = 'month'
-    }
+    canvas.style.height =
+        instance.data.fitheighttocontent
+            ? "max-content"
+            : "100%";
 
-    else {
-        instance.data.format = 'datetime-local'
-    }
+    canvas.style.display =
+        instance.data.vcenter ? "flex" : "";
 
-const initialDate = properties.initial
-    ? new Date(properties.initial)
-    : null;
+    canvas.style.justifyContent =
+        instance.data.vcenter ? "center" : "";
 
-const initialIsValid =
-    initialDate && !Number.isNaN(initialDate.getTime());
+    canvas.style.alignItems =
+        instance.data.vcenter ? "center" : "";
 
-const initialKey = initialIsValid
-    ? instance.data.format + ":" + initialDate.getTime()
-    : instance.data.format + ":empty";
+    const initialDate = properties.initial
+        ? new Date(properties.initial)
+        : null;
 
-const initialChanged =
-    instance.data.initialKey !== initialKey;
+    const initialIsValid =
+        initialDate !== null &&
+        !Number.isNaN(initialDate.getTime());
 
-instance.data.initialdate = initialIsValid
-    ? properties.initial
-    : null;
+    const initialKey = initialIsValid
+        ? instance.data.format + ":" + initialDate.getTime()
+        : instance.data.format + ":empty";
 
-instance.data.initialKey = initialKey;
+    const initialChanged =
+        instance.data.initialKey !== initialKey;
 
-if (initialChanged) {
-    const input = document.getElementById(instance.data.inputid);
+    instance.data.initialdate = initialIsValid
+        ? properties.initial
+        : null;
 
-    if (input) {
-        input.type = instance.data.format;
-
+    if (initialChanged) {
         if (!initialIsValid) {
             input.value = "";
-            instance.publishState("date");
-            instance.publishState("date_string", "");
         } else {
-            const pad = value =>
-                String(value).padStart(2, "0");
+            const pad = function(value) {
+                return String(value).padStart(2, "0");
+            };
 
             const dateValue =
                 initialDate.getFullYear() + "-" +
@@ -119,21 +123,24 @@ if (initialChanged) {
             } else if (instance.data.format === "time") {
                 input.value = timeValue;
             } else {
-                input.value = dateValue + "T" + timeValue;
+                input.value =
+                    dateValue + "T" + timeValue;
             }
-
-            instance.publishState(
-                "date",
-                instance.data.format === "time"
-                    ? dateValue + "T" + timeValue
-                    : input.value
-            );
-
-            instance.publishState("date_string", input.value);
         }
 
-        instance.publishState("valid", input.checkValidity());
-    }
-}
+        instance.data.publishInputValue(
+            initialIsValid ? initialDate : undefined
+        );
 
+        if (document.activeElement === input) {
+            instance.data.valueOnFocus = input.value;
+        }
+    }
+
+    instance.data.initialKey = initialKey;
+
+    instance.publishState(
+        "valid",
+        input.checkValidity()
+    );
 }
