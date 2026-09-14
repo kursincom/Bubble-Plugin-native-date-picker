@@ -10,5 +10,6 @@ function(instance, properties, context) {
     input.value = "";
     instance.data.publishInputValue();
     instance.publishState("valid", input.checkValidity());
+    instance.data.resetEventTriggered = true;
     instance.triggerEvent("reset");
 }
