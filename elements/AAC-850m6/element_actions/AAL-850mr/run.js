@@ -1,80 +1,50 @@
 function(instance, properties, context) {
+    const input =
+        instance.data.input ||
+        document.getElementById(instance.data.inputid);
 
-    
-        var input = document.getElementById(instance.data.inputid);
-    
-    
-    			function padTo2Digits(num) {
-                  return num.toString().padStart(2, '0');
-                }
+    if (!input) {
+        return;
+    }
 
-                function formatDate(date) {
-                  return (
-                    [
-                      date.getFullYear(),
-                      padTo2Digits(date.getMonth() + 1),
-                      padTo2Digits(date.getDate()),
-                    ].join('-') +
-                    ' ' +
-                    [
-                      padTo2Digits(date.getHours()),
-                      padTo2Digits(date.getMinutes()),
-//                      padTo2Digits(date.getSeconds()),
-                    ].join(':')
-                  );
-                }
+    const date = properties.date
+        ? new Date(properties.date)
+        : null;
 
-           if (instance.data.format == "date") {
-                
-                input.value = new Date(properties.date).toISOString().split('T')[0];
-           		instance.publishState("date", input.value);
-        		instance.publishState("date_string", input.value.toString());
+    if (!date || Number.isNaN(date.getTime())) {
+        input.value = "";
+        instance.data.publishInputValue();
+        instance.publishState("valid", input.checkValidity());
+        return;
+    }
 
-            }
-            
-            
-            else if (instance.data.format == "month") {
-                
-                var month = new Date(properties.date).toISOString().split('T')[0];
-                input.value = month.slice(0, -3);
-                instance.publishState("date", input.value);
-        		instance.publishState("date_string", input.value.toString());
+    const pad = function(value) {
+        return String(value).padStart(2, "0");
+    };
 
-            }
-            
-            else if (instance.data.format == "datetime-local") {
+    const dateValue =
+        date.getFullYear() + "-" +
+        pad(date.getMonth() + 1) + "-" +
+        pad(date.getDate());
 
-                const [date, time] = formatDate(new Date(properties.date)).split(' ');
-                input.value = date + 'T' + time;
-                instance.publishState("date", input.value);
-        		instance.publishState("date_string", input.value.toString());
+    const timeValue =
+        pad(date.getHours()) + ":" +
+        pad(date.getMinutes());
 
-            }
-            
-            else if (instance.data.format == "time") {
+    if (instance.data.format === "date") {
+        input.value = dateValue;
+    } else if (instance.data.format === "month") {
+        input.value = dateValue.slice(0, 7);
+    } else if (instance.data.format === "time") {
+        input.value = timeValue;
+    } else {
+        input.value = dateValue + "T" + timeValue;
+    }
 
-                const [date, time] = formatDate(new Date(properties.date)).split(' ');
+    instance.data.publishInputValue(date);
+    instance.publishState("valid", input.checkValidity());
 
-	            input.value = time;
-
-                var a = time
-                var b = toDate(a)
-                function toDate(dStr) {
-                    var now = new Date();
-                        now.setHours(dStr.substr(0,dStr.indexOf(":")));
-                        now.setMinutes(dStr.substr(dStr.indexOf(":")+1));
-                        now.setSeconds(0);
-                        return now;
-                }
-
-            instance.publishState("date", b);
-            instance.publishState("date_string", b.toString());
-
-            }
-    
-                    if (properties.triggerevent) {
-    	        instance.triggerEvent('dateready');
-                    }
-
-
+    if (properties.triggerevent === true) {
+        instance.triggerEvent("dateready");
+    }
 }

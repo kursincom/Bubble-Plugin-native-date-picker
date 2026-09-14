@@ -22,8 +22,11 @@ function(instance, properties) {
     else if (properties.format == 'time') {
         format = 'time'
     }
-    else if (properties.format == 'month') {
-        format = 'month'
+    else if (
+        properties.format === "month" ||
+        properties.format === "month (see info)"
+    ) {
+        format = "month";
     }
     else {
         format = 'datetime-local'

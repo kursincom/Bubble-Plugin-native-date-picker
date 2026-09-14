@@ -1,16 +1,13 @@
 function(instance, properties, context) {
+    const input =
+        instance.data.input ||
+        document.getElementById(instance.data.inputid);
 
-
-  //Load any data 
-
-    var input = document.getElementById(instance.data.inputid);
+    if (!input) {
+        return;
+    }
 
     input.value = "";
-    instance.publishState("date");
-    instance.publishState("date_string", "");
-
-  //Do the operation
-
-
-
+    instance.data.publishInputValue();
+    instance.publishState("valid", input.checkValidity());
 }
